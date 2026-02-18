@@ -1,7 +1,8 @@
 import { MapPin, Navigation, Clock, Footprints, Car } from "lucide-react";
 import type { Masjid } from "@/data/masjidData";
-import { formatTime12h, getNextPrayer, PRAYER_LABELS, canReachBeforeJamaat } from "@/utils/prayerUtils";
+import { formatTime12h, getNextPrayer, PRAYER_LABELS, canReachBeforeJamaat, getDayPrayerOrder, getEffectiveTime } from "@/utils/prayerUtils";
 import { estimateTravelMinutes, getGoogleMapsUrl, type UserLocation } from "@/utils/locationUtils";
+import { getMaghribTime, isFriday } from "@/utils/sunsetUtils";
 
 interface MasjidCardProps {
   masjid: Masjid;
@@ -13,13 +14,20 @@ interface MasjidCardProps {
 export default function MasjidCard({ masjid, distance, userLocation, now }: MasjidCardProps) {
   const walkMins = estimateTravelMinutes(distance, "walking");
   const driveMins = estimateTravelMinutes(distance, "driving");
-  const nextPrayer = getNextPrayer(masjid.timings, now);
+
+  // Inject computed Maghrib time
+  const maghrib = getMaghribTime(masjid.lat, masjid.lng, now);
+  const timingsWithMaghrib = { ...masjid.timings, maghrib };
+
+  const friday = isFriday(now);
+  const nextPrayer = getNextPrayer(timingsWithMaghrib, now, friday);
 
   const reachStatus = nextPrayer
     ? canReachBeforeJamaat(driveMins, nextPrayer.timeStr, now)
     : "passed";
 
   const navigateUrl = getGoogleMapsUrl(userLocation, masjid.lat, masjid.lng);
+  const dayPrayers = getDayPrayerOrder(friday);
 
   return (
     <div className="bg-card rounded-2xl border border-border p-4 shadow-sm animate-slide-up">
@@ -65,7 +73,7 @@ export default function MasjidCard({ masjid, distance, userLocation, now }: Masj
 
       {/* Jamaat timings row */}
       <div className="mt-3 grid grid-cols-5 gap-1">
-        {(["fajr", "zuhr", "asr", "maghrib", "isha"] as const).map((p) => (
+        {dayPrayers.map((p) => (
           <div
             key={p}
             className={`text-center rounded-lg py-1.5 text-[10px] ${
@@ -75,10 +83,18 @@ export default function MasjidCard({ masjid, distance, userLocation, now }: Masj
             }`}
           >
             <div className="uppercase tracking-wide">{PRAYER_LABELS[p].slice(0, 3)}</div>
-            <div className="font-medium mt-0.5">{formatTime12h(masjid.timings[p])}</div>
+            <div className="font-medium mt-0.5">{formatTime12h(getEffectiveTime(timingsWithMaghrib, p))}</div>
           </div>
         ))}
       </div>
+
+      {/* Jumu'ah reference (always shown on non-Friday) */}
+      {!friday && (
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground">
+          <span>🕌</span>
+          <span>Jumu'ah: {formatTime12h(masjid.timings.juma)}</span>
+        </div>
+      )}
 
       {/* Navigate button */}
       <a

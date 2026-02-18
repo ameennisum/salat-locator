@@ -12,6 +12,7 @@ import {
   type UserLocation,
 } from "@/utils/locationUtils";
 import { getNextPrayer, canReachBeforeJamaat } from "@/utils/prayerUtils";
+import { getMaghribTime, isFriday } from "@/utils/sunsetUtils";
 import { Wifi, WifiOff, RefreshCw } from "lucide-react";
 
 export default function Index() {
@@ -60,7 +61,10 @@ export default function Index() {
       .map((m) => {
         const distance = calculateDistance(userLocation.lat, userLocation.lng, m.lat, m.lng);
         const driveMins = estimateTravelMinutes(distance, "driving");
-        const nextP = getNextPrayer(m.timings, now);
+        const maghrib = getMaghribTime(m.lat, m.lng, now);
+        const timingsWithMaghrib = { ...m.timings, maghrib };
+        const friday = isFriday(now);
+        const nextP = getNextPrayer(timingsWithMaghrib, now, friday);
         const reachable = nextP
           ? canReachBeforeJamaat(driveMins, nextP.timeStr, now)
           : "passed";

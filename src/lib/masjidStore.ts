@@ -122,7 +122,7 @@ function csvToMasajid(csv: string): Masjid[] {
       fajr: to24h(fajr, "fajr"),
       zuhr: to24h(zuhr, "zuhr"),
       asr: to24h(asr, "asr"),
-      maghrib: "18:15", // Not in sheet — sensible Karachi default
+      maghrib: "00:00", // Computed dynamically from sunset
       isha: to24h(isha, "isha"),
       juma: to24h(juma, "juma"),
     };

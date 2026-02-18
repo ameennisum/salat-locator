@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Masjid } from "@/data/masjidData";
 import { getNextPrayerGlobal, PRAYER_LABELS, formatTime12h } from "@/utils/prayerUtils";
+import { getMaghribTime, isFriday } from "@/utils/sunsetUtils";
 
 interface PrayerCountdownProps {
   masajid: Masjid[];
@@ -14,8 +15,13 @@ export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
     return () => clearInterval(interval);
   }, []);
 
-  const allTimings = masajid.map((m) => m.timings);
-  const next = getNextPrayerGlobal(allTimings, now);
+  // Inject computed Maghrib into all timings
+  const friday = isFriday(now);
+  const allTimings = masajid.map((m) => ({
+    ...m.timings,
+    maghrib: getMaghribTime(m.lat, m.lng, now),
+  }));
+  const next = getNextPrayerGlobal(allTimings, now, friday);
 
   const hours = Math.floor(next.minutesRemaining / 60);
   const mins = next.minutesRemaining % 60;
