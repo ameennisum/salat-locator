@@ -3,7 +3,7 @@ import PrayerCountdown from "@/components/PrayerCountdown";
 import SearchBar from "@/components/SearchBar";
 import MasjidCard from "@/components/MasjidCard";
 import LocationBar from "@/components/LocationBar";
-import { masjidData } from "@/data/masjidData";
+import { useMasjidData } from "@/hooks/useMasjidData";
 import {
   DEFAULT_LOCATION,
   requestLocation,
@@ -12,8 +12,10 @@ import {
   type UserLocation,
 } from "@/utils/locationUtils";
 import { getNextPrayer, canReachBeforeJamaat } from "@/utils/prayerUtils";
+import { Wifi, WifiOff, RefreshCw } from "lucide-react";
 
 export default function Index() {
+  const { masajid, isOnline, isSyncing } = useMasjidData();
   const [userLocation, setUserLocation] = useState<UserLocation>(DEFAULT_LOCATION);
   const [hasLocation, setHasLocation] = useState(false);
   const [locLoading, setLocLoading] = useState(false);
@@ -47,7 +49,7 @@ export default function Index() {
 
   const sortedMasjids = useMemo(() => {
     const query = search.toLowerCase();
-    const filtered = masjidData.filter(
+    const filtered = masajid.filter(
       (m) =>
         m.name.toLowerCase().includes(query) ||
         m.area.toLowerCase().includes(query) ||
@@ -65,13 +67,12 @@ export default function Index() {
         return { masjid: m, distance, reachable };
       })
       .sort((a, b) => {
-        // Reachable first
         const order = { can_reach: 0, arriving_late: 1, passed: 2 };
         const diff = order[a.reachable] - order[b.reachable];
         if (diff !== 0) return diff;
         return a.distance - b.distance;
       });
-  }, [search, userLocation, now]);
+  }, [search, masajid, userLocation, now]);
 
   return (
     <div className="min-h-screen bg-background pb-8">
@@ -88,13 +89,25 @@ export default function Index() {
               onRefresh={refreshLocation}
             />
           </div>
-          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-lg">🕌</span>
+          <div className="flex items-center gap-2">
+            {/* Connectivity indicator */}
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              {isSyncing ? (
+                <RefreshCw className="h-3.5 w-3.5 animate-spin text-primary" />
+              ) : isOnline ? (
+                <Wifi className="h-3.5 w-3.5 text-success" />
+              ) : (
+                <WifiOff className="h-3.5 w-3.5 text-warning" />
+              )}
+            </div>
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="text-lg">🕌</span>
+            </div>
           </div>
         </div>
 
         {/* Countdown */}
-        <PrayerCountdown />
+        <PrayerCountdown masajid={masajid} />
 
         {/* Search */}
         <SearchBar value={search} onChange={setSearch} />
