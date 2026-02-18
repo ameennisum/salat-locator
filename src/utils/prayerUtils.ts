@@ -1,6 +1,6 @@
 import type { JamaatTimings } from "@/data/masjidData";
 
-export type PrayerName = "fajr" | "zuhr" | "asr" | "maghrib" | "isha";
+export type PrayerName = "fajr" | "zuhr" | "asr" | "maghrib" | "isha" | "juma";
 
 export const PRAYER_LABELS: Record<PrayerName, string> = {
   fajr: "Fajr",
@@ -8,9 +8,22 @@ export const PRAYER_LABELS: Record<PrayerName, string> = {
   asr: "Asr",
   maghrib: "Maghrib",
   isha: "Isha",
+  juma: "Jumu'ah",
 };
 
 const PRAYER_ORDER: PrayerName[] = ["fajr", "zuhr", "asr", "maghrib", "isha"];
+
+/** Return the display prayer sequence for a given day. On Friday, Zuhr is replaced by Juma. */
+export function getDayPrayerOrder(isFriday: boolean): PrayerName[] {
+  if (isFriday) return ["fajr", "juma", "asr", "maghrib", "isha"];
+  return [...PRAYER_ORDER];
+}
+
+/** Get the effective jamaat time for a prayer, using juma time on Fridays for the zuhr slot. */
+export function getEffectiveTime(timings: JamaatTimings, prayer: PrayerName): string {
+  if (prayer === "juma") return timings.juma;
+  return timings[prayer];
+}
 
 export function timeToMinutes(time: string): number {
   const [h, m] = time.split(":").map(Number);
@@ -32,16 +45,20 @@ export function formatTime12h(time24: string): string {
 
 export function getNextPrayer(
   timings: JamaatTimings,
-  now: Date
+  now: Date,
+  friday?: boolean
 ): { prayer: PrayerName; timeStr: string; minutesRemaining: number } | null {
   const nowMins = now.getHours() * 60 + now.getMinutes();
+  const isFri = friday ?? now.getDay() === 5;
+  const order = getDayPrayerOrder(isFri);
 
-  for (const prayer of PRAYER_ORDER) {
-    const prayerMins = timeToMinutes(timings[prayer]);
+  for (const prayer of order) {
+    const timeStr = getEffectiveTime(timings, prayer);
+    const prayerMins = timeToMinutes(timeStr);
     if (prayerMins > nowMins) {
       return {
         prayer,
-        timeStr: timings[prayer],
+        timeStr,
         minutesRemaining: prayerMins - nowMins,
       };
     }
@@ -68,13 +85,13 @@ export function canReachBeforeJamaat(
 
 export function getNextPrayerGlobal(
   allTimings: JamaatTimings[],
-  now: Date
+  now: Date,
+  friday?: boolean
 ): { prayer: PrayerName; timeStr: string; minutesRemaining: number } {
-  // Use the earliest next prayer across all masajid
   let best: { prayer: PrayerName; timeStr: string; minutesRemaining: number } | null = null;
 
   for (const timings of allTimings) {
-    const next = getNextPrayer(timings, now);
+    const next = getNextPrayer(timings, now, friday);
     if (next && (!best || next.minutesRemaining < best.minutesRemaining)) {
       best = next;
     }
