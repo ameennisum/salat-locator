@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
-import { masjidData } from "@/data/masjidData";
+import type { Masjid } from "@/data/masjidData";
 import { getNextPrayerGlobal, PRAYER_LABELS, formatTime12h } from "@/utils/prayerUtils";
 
-export default function PrayerCountdown() {
+interface PrayerCountdownProps {
+  masajid: Masjid[];
+}
+
+export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -10,7 +14,7 @@ export default function PrayerCountdown() {
     return () => clearInterval(interval);
   }, []);
 
-  const allTimings = masjidData.map((m) => m.timings);
+  const allTimings = masajid.map((m) => m.timings);
   const next = getNextPrayerGlobal(allTimings, now);
 
   const hours = Math.floor(next.minutesRemaining / 60);
