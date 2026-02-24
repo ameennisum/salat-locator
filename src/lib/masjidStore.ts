@@ -98,8 +98,15 @@ function to24h(time: string, prayer: string): string {
   const [h, m] = time.split(":").map(Number);
   if (isNaN(h) || isNaN(m)) return "00:00";
 
-  const isPM = prayer !== "fajr" && h < 12;
-  const hour24 = isPM ? h + 12 : h;
+  const isAM = prayer === "fajr";
+  let hour24: number;
+  if (isAM) {
+    // Fajr is always AM: 12 → 0, 1-11 stay as-is
+    hour24 = h === 12 ? 0 : h;
+  } else {
+    // All other prayers are always PM: 12 stays 12, 1-11 → +12
+    hour24 = h < 12 ? h + 12 : h;
+  }
   return `${hour24.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 }
 
