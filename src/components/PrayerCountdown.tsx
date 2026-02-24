@@ -23,9 +23,10 @@ export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
   }));
   const next = getNextPrayerGlobal(allTimings, now, friday);
 
-  const hours = Math.floor(next.minutesRemaining / 60);
-  const mins = next.minutesRemaining % 60;
-  const secs = 59 - now.getSeconds();
+  const totalSeconds = Math.max(0, next.minutesRemaining * 60 - now.getSeconds());
+  const hours = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
 
   return (
     <div className="bg-primary islamic-pattern rounded-2xl p-5 text-primary-foreground shadow-lg">
