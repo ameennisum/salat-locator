@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import InstallPrompt from "./components/InstallPrompt";
+import AdModal from "./components/AdModal";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
       <InstallPrompt />
+      <AdModal />
     </TooltipProvider>
   </QueryClientProvider>
 );
