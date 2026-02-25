@@ -7,7 +7,7 @@ const STORE_NAME = "masajid";
 const META_STORE = "meta";
 
 const SHEET_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/164JfTdOQxdw3AZecHjEHEKfFN-dGkHSIEE0zi2xZICQ/export?format=csv";
+  "https://docs.google.com/spreadsheets/d/13g6-dpOB3qsBiwxouPG6mCdzIpto_o88-ijZtQ5pUU4/export?format=csv";
 
 // ─── IndexedDB helpers ───────────────────────────────────────
 
