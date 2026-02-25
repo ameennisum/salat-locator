@@ -7,16 +7,16 @@ export default function AdModal() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const dismissed = sessionStorage.getItem("ad-dismissed");
-    if (!dismissed) {
-      const timer = setTimeout(() => setOpen(true), 1500);
-      return () => clearTimeout(timer);
-    }
+    // const dismissed = sessionStorage.getItem("ad-dismissed");
+    // if (!dismissed) {
+    const timer = setTimeout(() => setOpen(true), 1500);
+    return () => clearTimeout(timer);
+    // }
   }, []);
 
   function handleClose() {
     setOpen(false);
-    sessionStorage.setItem("ad-dismissed", "1");
+    // sessionStorage.setItem("ad-dismissed", "1");
   }
 
   return (
@@ -36,7 +36,11 @@ export default function AdModal() {
           >
             <X className="h-4 w-4" />
           </button>
-          <a href="https://baitussalam.org/" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://baitussalam.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <img
               src={adBanner}
               alt="Salat Locator - Find Nearby Masjids"
