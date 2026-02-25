@@ -1,12 +1,25 @@
 import { useEffect, useState } from "react";
 import type { Masjid } from "@/data/masjidData";
-import { getNextPrayerGlobal, PRAYER_LABELS, formatTime12h } from "@/utils/prayerUtils";
+import {
+  getNextPrayerGlobal,
+  PRAYER_LABELS,
+  formatTime12h,
+} from "@/utils/prayerUtils";
 import { getMaghribTime, isFriday } from "@/utils/sunsetUtils";
 
 const ISLAMIC_MONTHS = [
-  "Muharram", "Safar", "Rabi al-Awwal", "Rabi al-Thani",
-  "Jumada al-Ula", "Jumada al-Thani", "Rajab", "Sha'ban",
-  "Ramadan", "Shawwal", "Dhul Qi'dah", "Dhul Hijjah",
+  "Muharram",
+  "Safar",
+  "Rabi al-Awwal",
+  "Rabi al-Thani",
+  "Jumada al-Ula",
+  "Jumada al-Thani",
+  "Rajab",
+  "Sha'ban",
+  "Ramadan",
+  "Shawwal",
+  "Dhul Qi'dah",
+  "Dhul Hijjah",
 ];
 
 function getIslamicDate(date: Date): string {
@@ -50,24 +63,33 @@ export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
 
   return (
     <div className="bg-primary islamic-pattern rounded-2xl p-5 text-primary-foreground shadow-lg">
+      {/* Top Row */}
       <div className="flex items-start justify-between">
-        <div className="flex-1 text-center">
-          <p className="text-sm font-medium opacity-80 tracking-wide uppercase">Next Prayer</p>
-          <h2 className="text-3xl font-serif font-bold mt-1">
-            {PRAYER_LABELS[next.prayer]}
-          </h2>
-          <p className="text-sm opacity-80 mt-1">Jamaat at {formatTime12h(next.timeStr)}</p>
-          <div className="mt-4 flex justify-center gap-3">
-            <TimeBlock value={hours} label="Hours" />
-            <span className="text-3xl font-bold animate-pulse-glow">:</span>
-            <TimeBlock value={mins} label="Mins" />
-            <span className="text-3xl font-bold animate-pulse-glow">:</span>
-            <TimeBlock value={secs} label="Secs" />
-          </div>
-        </div>
-        <div className="text-right shrink-0 ml-3 pt-1">
-          <p className="text-[10px] uppercase tracking-wider opacity-70">Islamic Date</p>
-          <p className="text-xs font-semibold leading-tight mt-0.5 opacity-90">{islamicDate}</p>
+        <p className="text-sm font-medium opacity-80 tracking-wide uppercase">
+          Next Prayer
+        </p>
+
+        <p className="text-xs font-semibold leading-tight opacity-90">
+          {islamicDate}
+        </p>
+      </div>
+
+      {/* Center Content */}
+      <div className="mt-3 text-center">
+        <h2 className="text-3xl font-serif font-bold">
+          {PRAYER_LABELS[next.prayer]}
+        </h2>
+
+        <p className="text-sm opacity-80 mt-1">
+          Jamaat at {formatTime12h(next.timeStr)}
+        </p>
+
+        <div className="mt-4 flex justify-center gap-3">
+          <TimeBlock value={hours} label="Hours" />
+          <span className="text-3xl font-bold animate-pulse-glow">:</span>
+          <TimeBlock value={mins} label="Mins" />
+          <span className="text-3xl font-bold animate-pulse-glow">:</span>
+          <TimeBlock value={secs} label="Secs" />
         </div>
       </div>
     </div>
@@ -80,7 +102,9 @@ function TimeBlock({ value, label }: { value: number; label: string }) {
       <span className="text-3xl font-bold tabular-nums w-12 text-center">
         {value.toString().padStart(2, "0")}
       </span>
-      <span className="text-[10px] uppercase tracking-wider opacity-70">{label}</span>
+      <span className="text-[10px] uppercase tracking-wider opacity-70">
+        {label}
+      </span>
     </div>
   );
 }
