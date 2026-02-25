@@ -3,6 +3,25 @@ import type { Masjid } from "@/data/masjidData";
 import { getNextPrayerGlobal, PRAYER_LABELS, formatTime12h } from "@/utils/prayerUtils";
 import { getMaghribTime, isFriday } from "@/utils/sunsetUtils";
 
+const ISLAMIC_MONTHS = [
+  "Muharram", "Safar", "Rabi al-Awwal", "Rabi al-Thani",
+  "Jumada al-Ula", "Jumada al-Thani", "Rajab", "Sha'ban",
+  "Ramadan", "Shawwal", "Dhul Qi'dah", "Dhul Hijjah",
+];
+
+function getIslamicDate(date: Date): string {
+  const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+  });
+  const parts = formatter.formatToParts(date);
+  const day = parts.find((p) => p.type === "day")?.value ?? "";
+  const month = Number(parts.find((p) => p.type === "month")?.value ?? "1");
+  const year = parts.find((p) => p.type === "year")?.value ?? "";
+  return `${day} ${ISLAMIC_MONTHS[month - 1]} ${year} AH`;
+}
+
 interface PrayerCountdownProps {
   masajid: Masjid[];
 }
@@ -27,20 +46,28 @@ export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
   const mins = next.minutesRemaining % 60;
   const secs = 59 - now.getSeconds();
 
+  const islamicDate = getIslamicDate(now);
+
   return (
     <div className="bg-primary islamic-pattern rounded-2xl p-5 text-primary-foreground shadow-lg">
-      <div className="text-center">
-        <p className="text-sm font-medium opacity-80 tracking-wide uppercase">Next Prayer</p>
-        <h2 className="text-3xl font-serif font-bold mt-1">
-          {PRAYER_LABELS[next.prayer]}
-        </h2>
-        <p className="text-sm opacity-80 mt-1">Jamaat at {formatTime12h(next.timeStr)}</p>
-        <div className="mt-4 flex justify-center gap-3">
-          <TimeBlock value={hours} label="Hours" />
-          <span className="text-3xl font-bold animate-pulse-glow">:</span>
-          <TimeBlock value={mins} label="Mins" />
-          <span className="text-3xl font-bold animate-pulse-glow">:</span>
-          <TimeBlock value={secs} label="Secs" />
+      <div className="flex items-start justify-between">
+        <div className="flex-1 text-center">
+          <p className="text-sm font-medium opacity-80 tracking-wide uppercase">Next Prayer</p>
+          <h2 className="text-3xl font-serif font-bold mt-1">
+            {PRAYER_LABELS[next.prayer]}
+          </h2>
+          <p className="text-sm opacity-80 mt-1">Jamaat at {formatTime12h(next.timeStr)}</p>
+          <div className="mt-4 flex justify-center gap-3">
+            <TimeBlock value={hours} label="Hours" />
+            <span className="text-3xl font-bold animate-pulse-glow">:</span>
+            <TimeBlock value={mins} label="Mins" />
+            <span className="text-3xl font-bold animate-pulse-glow">:</span>
+            <TimeBlock value={secs} label="Secs" />
+          </div>
+        </div>
+        <div className="text-right shrink-0 ml-3 pt-1">
+          <p className="text-[10px] uppercase tracking-wider opacity-70">Islamic Date</p>
+          <p className="text-xs font-semibold leading-tight mt-0.5 opacity-90">{islamicDate}</p>
         </div>
       </div>
     </div>
