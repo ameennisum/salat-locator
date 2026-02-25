@@ -14,6 +14,13 @@ import {
 import { getNextPrayer, canReachBeforeJamaat } from "@/utils/prayerUtils";
 import { getMaghribTime, isFriday } from "@/utils/sunsetUtils";
 import { Wifi, WifiOff, RefreshCw } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Index() {
   const { masajid, isOnline, isSyncing } = useMasjidData();
@@ -21,6 +28,7 @@ export default function Index() {
   const [hasLocation, setHasLocation] = useState(false);
   const [locLoading, setLocLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"smart" | "time" | "distance">("smart");
   const [now, setNow] = useState(new Date());
 
   // Update time every 30s for card re-sorting
@@ -68,15 +76,21 @@ export default function Index() {
         const reachable = nextP
           ? canReachBeforeJamaat(driveMins, nextP.timeStr, now)
           : "passed";
-        return { masjid: m, distance, reachable };
+        const nextMins = nextP?.minutesRemaining ?? Infinity;
+        return { masjid: m, distance, reachable, nextMins };
       })
       .sort((a, b) => {
+        if (sortBy === "distance") return a.distance - b.distance;
+        if (sortBy === "time") {
+          return a.nextMins - b.nextMins;
+        }
+        // smart: reachability first, then distance
         const order = { can_reach: 0, arriving_late: 1, passed: 2 };
         const diff = order[a.reachable] - order[b.reachable];
         if (diff !== 0) return diff;
         return a.distance - b.distance;
       });
-  }, [search, masajid, userLocation, now]);
+  }, [search, masajid, userLocation, now, sortBy]);
 
   return (
     <div className="min-h-screen bg-background pb-8">
@@ -116,10 +130,22 @@ export default function Index() {
         {/* Search */}
         <SearchBar value={search} onChange={setSearch} />
 
-        {/* Results count */}
-        <p className="text-xs text-muted-foreground">
-          {sortedMasjids.length} masjid{sortedMasjids.length !== 1 ? "s" : ""} found
-        </p>
+        {/* Sort & count */}
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            {sortedMasjids.length} masjid{sortedMasjids.length !== 1 ? "s" : ""} found
+          </p>
+          <Select value={sortBy} onValueChange={(v) => setSortBy(v as "smart" | "time" | "distance")}>
+            <SelectTrigger className="w-[140px] h-8 text-xs">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="smart">Smart Sort</SelectItem>
+              <SelectItem value="time">Next Prayer</SelectItem>
+              <SelectItem value="distance">Nearest First</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Masjid List */}
         <div className="space-y-3">
