@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 import adBanner from "@/assets/ad-banner.png";
 
@@ -24,7 +20,12 @@ export default function AdModal() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) handleClose();
+      }}
+    >
       <DialogContent className="p-0 overflow-hidden max-w-sm rounded-2xl border-0 bg-transparent shadow-2xl [&>button]:hidden">
         <DialogTitle className="sr-only">Advertisement</DialogTitle>
         <div className="relative">
@@ -35,11 +36,13 @@ export default function AdModal() {
           >
             <X className="h-4 w-4" />
           </button>
-          <img
-            src={adBanner}
-            alt="Salat Locator - Find Nearby Masjids"
-            className="w-full h-auto rounded-2xl"
-          />
+          <a href="https://baitussalam.org/" target="_blank" rel="noopener noreferrer">
+            <img
+              src={adBanner}
+              alt="Salat Locator - Find Nearby Masjids"
+              className="w-full h-auto rounded-2xl"
+            />
+          </a>
         </div>
       </DialogContent>
     </Dialog>
