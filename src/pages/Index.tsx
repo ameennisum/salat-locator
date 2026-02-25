@@ -127,24 +127,25 @@ export default function Index() {
         {/* Countdown */}
         <PrayerCountdown masajid={masajid} />
 
-        {/* Search */}
-        <SearchBar value={search} onChange={setSearch} />
+        {/* Sticky Search & Sort */}
+        <div className="sticky top-0 z-30 bg-background pb-2 -mx-4 px-4 pt-2 space-y-2">
+          <SearchBar value={search} onChange={setSearch} />
 
-        {/* Sort & count */}
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">
-            {sortedMasjids.length} masjid{sortedMasjids.length !== 1 ? "s" : ""} found
-          </p>
-          <Select value={sortBy} onValueChange={(v) => setSortBy(v as "smart" | "time" | "distance")}>
-            <SelectTrigger className="w-[140px] h-8 text-xs">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="smart">Smart Sort</SelectItem>
-              <SelectItem value="time">Next Prayer</SelectItem>
-              <SelectItem value="distance">Nearest First</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              {sortedMasjids.length} masjid{sortedMasjids.length !== 1 ? "s" : ""} found
+            </p>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as "smart" | "time" | "distance")}>
+              <SelectTrigger className="w-[140px] h-8 text-xs">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="smart">Smart Sort</SelectItem>
+                <SelectItem value="time">Next Prayer</SelectItem>
+                <SelectItem value="distance">Nearest First</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Masjid List */}
