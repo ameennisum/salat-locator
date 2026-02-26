@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import PrayerCountdown from "@/components/PrayerCountdown";
 import SearchBar from "@/components/SearchBar";
 import MasjidCard from "@/components/MasjidCard";
@@ -14,6 +14,7 @@ import {
 import { getNextPrayer, canReachBeforeJamaat } from "@/utils/prayerUtils";
 import { getMaghribTime, isFriday } from "@/utils/sunsetUtils";
 import { Wifi, WifiOff, RefreshCw } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -30,6 +31,25 @@ export default function Index() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"smart" | "time" | "distance">("smart");
   const [now, setNow] = useState(new Date());
+
+  // Show toast when offline
+  const prevOnline = useRef(isOnline);
+  useEffect(() => {
+    if (!isOnline && prevOnline.current) {
+      toast({
+        title: "No Internet Connection",
+        description: "You are offline. Showing cached data.",
+        variant: "destructive",
+      });
+    }
+    if (isOnline && !prevOnline.current) {
+      toast({
+        title: "Back Online",
+        description: "Connection restored. Syncing data...",
+      });
+    }
+    prevOnline.current = isOnline;
+  }, [isOnline]);
 
   // Update time every 30s for card re-sorting
   useEffect(() => {
