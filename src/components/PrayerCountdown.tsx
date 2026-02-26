@@ -35,16 +35,49 @@ function getIslamicDate(date: Date): string {
   return `${day} ${ISLAMIC_MONTHS[month - 1]} ${year} AH`;
 }
 
+async function extractIslamicDate(url) {
+  try {
+    // Fetch the HTML of the prayer time page
+    const response = await fetch(url);
+    const htmlText = await response.text();
+
+    // Create a DOM parser
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlText, "text/html");
+
+    const hijriDateElement = doc.querySelector(
+      "body > header > div.newHeaderTop > div > div.hdrTopRight > ul > li:nth-child(3)",
+    );
+
+    if (hijriDateElement) {
+      return hijriDateElement.textContent;
+    }
+  } catch (err) {
+    console.error("Error extracting Islamic date:", err);
+    return null;
+  }
+}
+
 interface PrayerCountdownProps {
   masajid: Masjid[];
 }
 
 export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
   const [now, setNow] = useState(new Date());
+  const [islamicDate1, setIslamicDate1] = useState<string | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    async function fetchIslamicDate() {
+      const date = await extractIslamicDate("https://jang.com.pk/prayer-time");
+      setIslamicDate1(date);
+    }
+
+    fetchIslamicDate();
   }, []);
 
   // Inject computed Maghrib into all timings
@@ -59,8 +92,6 @@ export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
   const mins = next.minutesRemaining % 60;
   const secs = 59 - now.getSeconds();
 
-  const islamicDate = getIslamicDate(now);
-
   return (
     <div className="bg-primary islamic-pattern rounded-2xl p-5 text-primary-foreground shadow-lg">
       {/* Top Row */}
@@ -69,8 +100,8 @@ export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
           Next Prayer
         </p>
 
-        <p className="text-xs font-semibold leading-tight opacity-90">
-          {islamicDate}
+        <p className="text-xs font-semibold text-right leading-left opacity-90">
+          {islamicDate1 ?? "Loading..."}
         </p>
       </div>
 
