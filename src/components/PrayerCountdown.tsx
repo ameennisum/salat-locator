@@ -102,19 +102,21 @@ export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
   return (
     <div className="bg-primary islamic-pattern rounded-2xl p-5 text-primary-foreground shadow-lg">
       {/* Top Row */}
-      <div className="flex items-start justify-between">
-        <p className="text-sm font-medium opacity-80 tracking-wide uppercase">
-          Next Prayer
-        </p>
-
+      <div className="flex flex-col items-center justify-center">
         <button
           onClick={fetchIslamicDate}
           disabled={dateLoading}
           className="flex items-center gap-1 text-xs font-semibold text-right opacity-90 hover:opacity-100 transition-opacity"
         >
           <span>{islamicDate1 ?? "Loading..."}</span>
-          <RefreshCw className={`h-3 w-3 ${dateLoading ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`h-3 w-3 ${dateLoading ? "animate-spin" : ""}`}
+          />
         </button>
+        &nbsp;
+        <p className="text-sm font-medium opacity-80 tracking-wide uppercase">
+          Next Prayer
+        </p>
       </div>
 
       {/* Center Content */}
