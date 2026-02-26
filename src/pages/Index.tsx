@@ -14,7 +14,6 @@ import {
 import { getNextPrayer, canReachBeforeJamaat } from "@/utils/prayerUtils";
 import { getMaghribTime, isFriday } from "@/utils/sunsetUtils";
 import { Wifi, WifiOff, RefreshCw } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -32,24 +31,7 @@ export default function Index() {
   const [sortBy, setSortBy] = useState<"smart" | "time" | "distance">("smart");
   const [now, setNow] = useState(new Date());
 
-  // Show toast when offline
-  const prevOnline = useRef(isOnline);
-  useEffect(() => {
-    if (!isOnline && prevOnline.current) {
-      toast({
-        title: "No Internet Connection",
-        description: "You are offline. Showing cached data.",
-        variant: "destructive",
-      });
-    }
-    if (isOnline && !prevOnline.current) {
-      toast({
-        title: "Back Online",
-        description: "Connection restored. Syncing data...",
-      });
-    }
-    prevOnline.current = isOnline;
-  }, [isOnline]);
+  // (connectivity toast removed — using sticky bar instead)
 
   // Update time every 30s for card re-sorting
   useEffect(() => {
@@ -114,6 +96,12 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background pb-8">
+      {!isOnline && (
+        <div className="sticky top-0 z-50 bg-destructive text-destructive-foreground text-center text-xs font-medium py-2">
+          <WifiOff className="inline h-3.5 w-3.5 mr-1 -mt-0.5" />
+          No Internet Connection
+        </div>
+      )}
       <div className="mx-auto max-w-md px-4 pt-6 space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
