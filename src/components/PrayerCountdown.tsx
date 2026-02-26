@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { RefreshCw } from "lucide-react";
 import type { Masjid } from "@/data/masjidData";
 import {
   getNextPrayerGlobal,
@@ -65,20 +66,26 @@ interface PrayerCountdownProps {
 export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
   const [now, setNow] = useState(new Date());
   const [islamicDate1, setIslamicDate1] = useState<string | null>(null);
+  const [dateLoading, setDateLoading] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    async function fetchIslamicDate() {
+  const fetchIslamicDate = useCallback(async () => {
+    setDateLoading(true);
+    try {
       const date = await extractIslamicDate("https://jang.com.pk/prayer-time");
       setIslamicDate1(date);
+    } finally {
+      setDateLoading(false);
     }
-
-    fetchIslamicDate();
   }, []);
+
+  useEffect(() => {
+    fetchIslamicDate();
+  }, [fetchIslamicDate]);
 
   // Inject computed Maghrib into all timings
   const friday = isFriday(now);
@@ -100,9 +107,14 @@ export default function PrayerCountdown({ masajid }: PrayerCountdownProps) {
           Next Prayer
         </p>
 
-        <p className="text-xs font-semibold text-right leading-left opacity-90">
-          {islamicDate1 ?? "Loading..."}
-        </p>
+        <button
+          onClick={fetchIslamicDate}
+          disabled={dateLoading}
+          className="flex items-center gap-1 text-xs font-semibold text-right opacity-90 hover:opacity-100 transition-opacity"
+        >
+          <span>{islamicDate1 ?? "Loading..."}</span>
+          <RefreshCw className={`h-3 w-3 ${dateLoading ? "animate-spin" : ""}`} />
+        </button>
       </div>
 
       {/* Center Content */}
