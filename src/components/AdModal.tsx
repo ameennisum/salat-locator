@@ -9,7 +9,7 @@ export default function AdModal() {
   useEffect(() => {
     // const dismissed = sessionStorage.getItem("ad-dismissed");
     // if (!dismissed) {
-    const timer = setTimeout(() => setOpen(true), 1500);
+    const timer = setTimeout(() => setOpen(false), 1500);
     return () => clearTimeout(timer);
     // }
   }, []);
