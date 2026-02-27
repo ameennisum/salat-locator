@@ -1,6 +1,6 @@
 {
-  "name": "Bajamat - Masjid Near Me",
-  "short_name": "Bajamat",
+  "name": "Find My Masjid - Masjid Near Me",
+  "short_name": "Find My Masjid",
   "description": "Find nearby masajid and prayer times",
   "start_url": "/",
   "display": "standalone",

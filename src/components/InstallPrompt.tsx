@@ -60,7 +60,7 @@ export default function InstallPrompt() {
         {showIosPrompt ? <Share className="h-5 w-5 text-primary" /> : <Download className="h-5 w-5 text-primary" />}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground">Install Bajamat</p>
+        <p className="text-sm font-medium text-foreground">Install Find My Masjid</p>
         {showIosPrompt ? (
           <p className="text-xs text-muted-foreground">
             Tap <Share className="inline h-3 w-3 -mt-0.5" /> then <span className="font-semibold">"Add to Home Screen"</span>
